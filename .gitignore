@@ -4,3 +4,4 @@ plots/closest_fact/*.json
 plots/closest_fact/*.js
 !plots/closest_fact/index.js
 __pycache__
+.vscode

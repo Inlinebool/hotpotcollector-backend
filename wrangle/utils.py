@@ -6,12 +6,6 @@ from nltk.tokenize import word_tokenize
 import string
 import re
 
-glove_file = 'glove.840B.300d.pkl'
-tf_file = 'tf_1000_coref.pkl'
-idf_file = 'idf_1000_coref.pkl'
-hotpot_file = 'hotpot_small_1000_coref.json'
-output_file = 'hotpot_small_1000_embeddings_tfidf_coref.json'
-
 stopwords = set(stopwords.words('english'))
 
 unk = np.array([0.22418134, -
@@ -173,7 +167,7 @@ unk = np.array([0.22418134, -
                 0.077677034, -
                 0.144811], dtype='float32')
 
-def prepare_data():
+def prepare_data(glove_file, hotpot_file, tf_file, idf_file):
     
     with open(glove_file, 'rb') as fp:
         glove = pk.load(fp)
@@ -187,7 +181,7 @@ def prepare_data():
     with open(idf_file, 'rb') as fp:
         idf = pk.load(fp)
     
-    return glove, hotpot, tf, idf
+    return glove, hotpot, tf, idf, unk
 
 def normalize_answer(s):
 
@@ -212,7 +206,11 @@ def sentence_embedding(i, s, glove, tf, idf):
     tokens = [w for w in tokens if w not in stopwords]
     embedding = np.zeros(300, dtype='float32')
     for w in tokens:
-        tfidf = tf[i][w] * idf[w]
+        tfidf = 0
+        if (w not in idf):
+            print("Term not found in idf.", w)
+        else:
+            tfidf = idf[w]
         if (tfidf < 0):
             tfidf = 0
         if w in glove:
@@ -221,3 +219,6 @@ def sentence_embedding(i, s, glove, tf, idf):
             embedding += tfidf * unk
     embedding /= len(tokens)
     return embedding
+
+def cosine_similarity(a, b):
+    return np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b)).item()
