@@ -1,6 +1,7 @@
 from flask import Flask
 from flask import render_template
 from flask import request
+from flask_cors import CORS
 import json
 import random
 import datetime
@@ -10,7 +11,8 @@ import os
 def new_annotation(user, date_time, levels):
     global annotations
     global annotation_filename
-    annotation_filename = 'dataset/annotation_' + user + '_' + date_time + ".json"
+    annotation_filename = 'user_annotations/annotation_' + \
+        user + '_' + date_time + ".json"
     annotations = {}
     annotations['user'] = user
     annotations['time'] = date_time
@@ -19,10 +21,11 @@ def new_annotation(user, date_time, levels):
 
 
 app = Flask(__name__)
+CORS(app)
 
-dataset_filename = "dataset/hotpot_small_1000_embeddings_tfidf_coref.json"
+dataset_filename = "hotpot/hotpot_small_1000_embeddings_tfidf_coref.json"
 
-annotation_filename = "dataset/anotation.json"
+annotation_filename = "user_annotations/anotation.json"
 
 answered_list_filename = "answered_questions.json"
 
@@ -43,7 +46,7 @@ user_range = {
     'zhengzhong': [75371, 90447]
 }
 
-levels = {}
+levels = {'easy': True, 'medium': True, 'hard': True, }
 
 with open(dataset_filename) as fp:
     dataset = json.load(fp)
@@ -56,14 +59,14 @@ else:
     answered_list = set([])
 
 
-@app.route("/", methods=['GET'])
-def index():
-    return render_template('index.html')
+# @app.route("/", methods=['GET'])
+# def index():
+#     return render_template('index.html')
 
 
-@app.route("/collector", methods=['GET'])
-def collector():
-    return render_template('collector.html')
+# @app.route("/collector", methods=['GET'])
+# def collector():
+#     return render_template('collector.html')
 
 
 @app.route("/question", methods=['GET'])
