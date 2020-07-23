@@ -5,3 +5,5 @@ plots/closest_fact/*.js
 !plots/closest_fact/index.js
 __pycache__
 .vscode
+data
+user_annotations

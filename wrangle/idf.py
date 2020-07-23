@@ -4,18 +4,16 @@ import json
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 import math
-
-data_folder = "../hotpot/"
-hotpot_file = 'hotpot_small_1000_coref.json'
-output_file = 'idf_1000_coref.pkl'
+from wrangle.file_constants import HOTPOT_SMALL_COREF_FILE, IDF_FILE
 
 stopwords = set(stopwords.words('english'))
 
-with open(data_folder + hotpot_file, 'r') as fp:
+with open(HOTPOT_SMALL_COREF_FILE, 'r') as fp:
     hotpot = json.load(fp)
 
 idf = {}
 N = 0
+
 
 def extract_terms(sentence: str):
     terms = set([])
@@ -24,6 +22,7 @@ def extract_terms(sentence: str):
     for w in tokens:
         terms.add(w)
     update_idf(terms)
+
 
 def update_idf(terms: set):
     global idf, N
@@ -34,10 +33,12 @@ def update_idf(terms: set):
         else:
             idf[term] += 1
 
+
 def finalize_idf():
     global idf, N
     for term in idf:
         idf[term] = math.log(N / (1 + idf[term]))
+
 
 for datum in hotpot:
     terms = set([])
@@ -50,6 +51,5 @@ for datum in hotpot:
 finalize_idf()
 # print(idf)
 
-with open(output_file, 'wb') as fp:
+with open(IDF_FILE, 'wb') as fp:
     pk.dump(idf, fp, protocol=pk.HIGHEST_PROTOCOL)
-

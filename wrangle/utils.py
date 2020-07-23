@@ -167,8 +167,9 @@ unk = np.array([0.22418134, -
                 0.077677034, -
                 0.144811], dtype='float32')
 
+
 def prepare_data(glove_file, hotpot_file, tf_file, idf_file):
-    
+
     with open(glove_file, 'rb') as fp:
         glove = pk.load(fp)
 
@@ -180,8 +181,9 @@ def prepare_data(glove_file, hotpot_file, tf_file, idf_file):
 
     with open(idf_file, 'rb') as fp:
         idf = pk.load(fp)
-    
+
     return glove, hotpot, tf, idf, unk
+
 
 def normalize_answer(s):
 
@@ -204,6 +206,10 @@ def normalize_answer(s):
 def sentence_embedding(i, s, glove, tf, idf):
     tokens = word_tokenize(s)
     tokens = [w for w in tokens if w not in stopwords]
+    return tokenized_embedding(tokens, glove, tf, idf)
+
+
+def tokenized_embedding(tokens: list, glove, tf, idf):
     embedding = np.zeros(300, dtype='float32')
     for w in tokens:
         tfidf = 0
@@ -220,5 +226,34 @@ def sentence_embedding(i, s, glove, tf, idf):
     embedding /= len(tokens)
     return embedding
 
+
 def cosine_similarity(a, b):
     return np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b)).item()
+
+
+def multihop_query_embedding(q: str, chosen_facts: list, glove, tf, idf):
+    query_tokens = word_tokenize(q)
+    query_tokens = [w for w in query_tokens if w not in stopwords]
+    # print(query_tokens)
+    # print(chosen_facts)
+    for fact in chosen_facts:
+        fact_tokens = word_tokenize(fact)
+        fact_tokens = [w for w in fact_tokens if w not in stopwords]
+        # print(fact_tokens)
+        for token in fact_tokens:
+            if token not in query_tokens:
+                query_tokens.append(token)
+    # print(query_tokens)
+    return tokenized_embedding(query_tokens, glove, tf, idf)
+
+
+def rank_facts(flattened_facts: list, question: str, chosen_facts: list, glove, tf, idf):
+    ranked_facts = []
+    query_embedding = multihop_query_embedding(
+        question, chosen_facts, glove, tf, idf)
+    for fact in flattened_facts:
+        fact_embedding = sentence_embedding(-1, fact[1], glove, tf, idf)
+        similarity = cosine_similarity(fact_embedding, query_embedding)
+        ranked_facts.append(fact[0], fact[1], fact[2], similarity)
+    ranked_facts = sorted(ranked_facts, key=lambda item: item[3], reverse=True)
+    return ranked_facts

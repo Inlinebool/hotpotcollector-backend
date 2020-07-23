@@ -23,13 +23,15 @@ let keyToLabel = {
 function makePlot(key, data) {
     let d = data[key];
 
+    let size = d.length
+
     console.log(d);
 
     let svg = d3.select("body").append("svg").attr('width', plotWidth).attr('height', plotHeight);
 
     let rankExtent = d3.extent(d);
 
-    let xScale = d3.scaleLinear().domain(rankExtent).nice().range([paddingLeft, plotWidth - paddingRight]);
+    let xScale = d3.scaleLinear().domain([0, 60]).nice().range([paddingLeft, plotWidth - paddingRight]);
 
     let bins = d3.histogram()
         .thresholds(xScale.ticks(40))
@@ -38,7 +40,7 @@ function makePlot(key, data) {
     console.log(bins);
 
     let yScale = d3.scaleLinear()
-        .domain([0, 450]).nice()
+        .domain([0, 0.8])
         .range([plotHeight - paddingTop, paddingBottom]);
 
     svg.append("g")
@@ -48,19 +50,19 @@ function makePlot(key, data) {
         .join("rect")
         .attr("x", d => xScale(d.x0) + 1)
         .attr("width", d => Math.max(0, xScale(d.x1) - xScale(d.x0) - 1))
-        .attr("y", d => yScale(d.length))
-        .attr("height", d => yScale(0) - yScale(d.length));
+        .attr("y", d => yScale(d.length / size))
+        .attr("height", d => yScale(0) - yScale(d.length / size));
 
     const xAxisTicks = xScale.ticks()
         .filter(tick => Number.isInteger(tick));
     const xAxis = d3.axisBottom(xScale)
         .tickValues(xAxisTicks)
         .tickFormat(d3.format('d'));
-    const yAxisTicks = yScale.ticks()
-        .filter(tick => Number.isInteger(tick));
+    // const yAxisTicks = yScale.ticks()
+    //     .filter(tick => Number.isInteger(tick));
     const yAxis = d3.axisLeft(yScale)
-        .tickValues(yAxisTicks)
-        .tickFormat(d3.format('d'));
+        // .tickValues(yAxisTicks)
+        .tickFormat(d3.format('.0%'));
 
     svg.append("g")
         .attr("class", "x axis")
@@ -96,10 +98,18 @@ function makePlot(key, data) {
 
 d3.select("body")
     .append("h2")
-    .text("Histograms of supporting fact rankings. (tfidf and coref resolution)")
+    .text("Histograms of supporting fact rankings. (tfidf and coref resolution, onetime ranking.)")
 
 for (let key of keys) {
-    makePlot(key, dataTfidfCoref);
+    makePlot(key, dataOnetime);
+}
+
+d3.select("body")
+    .append("h2")
+    .text("Histograms of supporting fact rankings. (tfidf and coref resolution, multihop ranking.)")
+
+for (let key of keys) {
+    makePlot(key, dataMultihop);
 }
 
 d3.select("body")

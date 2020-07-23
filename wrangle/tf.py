@@ -1,17 +1,14 @@
 import pickle as pk
 import numpy as np
 import json
+import math
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
-import math
-
-data_folder = "../hotpot/"
-hotpot_file = 'hotpot_small_1000_coref.json'
-output_file = 'tf_1000_coref.pkl'
+from wrangle.file_constants import HOTPOT_SMALL_COREF_FILE, TF_FILE
 
 stopwords = set(stopwords.words('english'))
 
-with open(data_folder + hotpot_file, 'r') as fp:
+with open(HOTPOT_SMALL_COREF_FILE, 'r') as fp:
     hotpot = json.load(fp)
 
 def extract_terms(terms: dict, sentence: str):
@@ -45,6 +42,6 @@ for datum in hotpot:
 
 # print(tf)
 
-with open(output_file, 'wb') as fp:
+with open(TF_FILE, 'wb') as fp:
     pk.dump(tf, fp, protocol=pk.HIGHEST_PROTOCOL)
 

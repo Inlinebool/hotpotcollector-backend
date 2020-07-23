@@ -1,6 +1,9 @@
-rm data_original_1000.js
-rm data_tfidf_coref_1000.js
-cp original_pos_1000.json data_original_1000.js
-cp closest_fact_1000_tfidf_coref.json data_tfidf_coref_1000.js
-sed -i '' '1s/^/ var dataOriginal = /' data_original_1000.js
-sed -i '' '1s/^/ var dataTfidfCoref = /' data_tfidf_coref_1000.js
+rm data_original_100.js
+rm data_onetime_100.js
+rm data_multihop_100.js
+cp closest_fact_100_original.json data_original_100.js
+cp closest_fact_100_onetime.json data_onetime_100.js
+cp closest_fact_100_multihop.json data_multihop_100.js
+sed -i '' '1s/^/ var dataOriginal = /' data_original_100.js
+sed -i '' '1s/^/ var dataOnetime = /' data_onetime_100.js
+sed -i '' '1s/^/ var dataMultihop = /' data_multihop_100.js

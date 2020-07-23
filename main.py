@@ -7,7 +7,7 @@ from flask import render_template
 from flask import request
 from flask_cors import CORS
 
-from wrangle import utils
+from .wrangle import utils
 
 
 def new_annotation(user, date_time, levels):
