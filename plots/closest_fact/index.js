@@ -40,7 +40,7 @@ function makePlot(key, data) {
     console.log(bins);
 
     let yScale = d3.scaleLinear()
-        .domain([0, 0.8])
+        .domain([0, 0.6])
         .range([plotHeight - paddingTop, paddingBottom]);
 
     svg.append("g")
