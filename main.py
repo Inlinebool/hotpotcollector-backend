@@ -46,7 +46,6 @@ def read_answered_list():
         answered_list = set([])
 
 
-
 @app.route("/question", methods=['GET'])
 def request_datum():
     idx = request.args.get('idx')
