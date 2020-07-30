@@ -3,72 +3,48 @@ import random
 import datetime
 import os
 from flask import Flask
-from flask import render_template
 from flask import request
 from flask_cors import CORS
 
-from .wrangle import utils
-
-
-def new_annotation(user, date_time, levels):
-    global annotations
-    global annotation_filename
-    annotation_filename = 'user_annotations/annotation_' + \
-        user + '_' + date_time + ".json"
-    annotations = {}
-    annotations['user'] = user
-    annotations['time'] = date_time
-    annotations['levels'] = levels
-    annotations['data'] = []
+from wrangle import ranker
+from wrangle.data_loader import HotpotDataLoader
+from wrangle.file_constants import HOTPOT_SMALL_COREF_FLATTENED_FILE, ANNOTATION_DIR, ANSWERED_LIST_FILE
 
 
 app = Flask(__name__)
 CORS(app)
-
-dataset_filename = "hotpot/hotpot_small_1000_embeddings_tfidf_coref.json"
-
-annotation_filename = "user_annotations/anotation.json"
-
-answered_list_filename = "answered_questions.json"
 
 annotations = {}
 
 user = 'anon'
 now = datetime.datetime.now()
 date_time = now.strftime("%m_%d_%Y_%H:%M:%S")
-new_annotation(user, date_time, {'easy': True, 'medium': True, 'hard': True})
+
+data_loader = HotpotDataLoader()
+
+user_size = int(data_loader.size / 6)
 
 user_range = {
-    'anon': [0, 1000],
-    'josh': [0, 15074],
-    'mihai': [15075, 30148],
-    'matt': [30149, 45222],
-    'kairong': [45223, 60296],
-    'fan': [60297, 75370],
-    'zhengzhong': [75371, 90447]
+    'anon': [0, data_loader.size - 1],
+    'josh': [0, user_size - 1],
+    'mihai': [user_size, user_size * 2 - 1],
+    'matt': [user_size * 2, user_size * 3 - 1],
+    'kairong': [user_size * 3, user_size * 4 - 1],
+    'fan': [user_size * 4, user_size * 5 - 1],
+    'zhengzhong': [user_size * 5, data_loader.size - 1]
 }
 
-levels = {'easy': True, 'medium': True, 'hard': True, }
-
-with open(dataset_filename) as fp:
-    dataset = json.load(fp)
-
-if (os.path.exists(answered_list_filename)):
-    with open(answered_list_filename) as fp:
-        answered_list = set(json.load(fp))
-        print(answered_list)
-else:
-    answered_list = set([])
+answered_list = set([])
 
 
-# @app.route("/", methods=['GET'])
-# def index():
-#     return render_template('index.html')
+def read_answered_list():
+    global answered_list
+    if (os.path.exists(ANSWERED_LIST_FILE)):
+        with open(ANSWERED_LIST_FILE) as fp:
+            answered_list = set(json.load(fp))
+    else:
+        answered_list = set([])
 
-
-# @app.route("/collector", methods=['GET'])
-# def collector():
-#     return render_template('collector.html')
 
 
 @app.route("/question", methods=['GET'])
@@ -76,47 +52,40 @@ def request_datum():
     idx = request.args.get('idx')
     if idx:
         datum_idx = int(request.args.get('idx'))
-        print(datum_idx)
+        return data_loader.get_datum(datum_idx)
     else:
+        user = request.args.get('user')
+        easy = request.args.get('easy') == 'true'
+        medium = request.args.get('medium') == 'true'
+        hard = request.args.get('hard') == 'true'
+        levels = {'easy': easy, 'medium': medium, 'hard': hard}
         range = user_range[user]
-        datum_idx = random.randint(range[0], range[1])
-        print(dataset[datum_idx]['level'])
-        while not levels[dataset[datum_idx]['level']] or datum_idx in answered_list:
-            datum_idx = random.randint(range[0], range[1])
-            print(dataset[datum_idx]['level'])
-
-    return {'idx': datum_idx, 'data': dataset[datum_idx]}
-
-
-@app.route("/setuser", methods=['POST'])
-def setuser():
-    data = request.get_json()
-    print(data)
-    global user
-    user = data['user']
-    global levels
-    levels = data['levels']
-    global annotation_filename
-    global annotations
-    now = datetime.datetime.now()
-    date_time = now.strftime("%m_%d_%Y_%H:%M:%S")
-    new_annotation(user, date_time, levels)
-    return {"success": "true"}
+        read_answered_list()
+        return data_loader.get_random_datum(range, levels, answered_list)
 
 
 @app.route("/answer", methods=['POST'])
 def get_answer():
-    print("handling post")
-    # print(request.values)
-    print(request.get_json())
     data = request.get_json()
 
-    annotations['data'].append(data)
-    answered_list.add(data['idx'])
+    now = datetime.datetime.now()
+    date_time = now.strftime("%m_%d_%Y_%H:%M:%S")
 
-    print(annotations)
+    annotation_filename = ANNOTATION_DIR + 'annotation_' + \
+        data['user'] + '_' + date_time + ".json"
+    annotations = {}
+    annotations['user'] = data['user']
+    annotations['time'] = date_time
+    annotations['levels'] = data['levels']
+    annotations['data'] = data['data']
 
     with open(annotation_filename, 'w') as fp:
         json.dump(annotations, fp)
+
+    global answered_list
+    if (data['data']['answer']):
+        answered_list.add(int(data['data']['idx']))
+        with open(ANSWERED_LIST_FILE, 'w') as fp:
+            json.dump(list(answered_list), fp)
 
     return {"success": "true"}
