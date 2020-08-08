@@ -2,11 +2,11 @@ import json
 import re
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
-from wrangle.file_constants import HOTPOT_SMALL_FILE, HOTPOT_SMALL_COREF_FILE
+from wrangle.file_constants import HOTPOT_FILE, HOTPOT_COREF_FILE
 
 stopwords = set(stopwords.words('english'))
 
-with open(HOTPOT_SMALL_FILE, 'r') as fp:
+with open(HOTPOT_FILE, 'r') as fp:
     hotpot = json.load(fp)
 
 pronouns = ['it', 'It', 'they', 'They', 'she', 'She', 'he', 'He']
@@ -34,5 +34,5 @@ for datum in hotpot:
 
 # print(tf)
 
-with open(HOTPOT_SMALL_COREF_FILE, 'w') as fp:
+with open(HOTPOT_COREF_FILE, 'w') as fp:
     json.dump(hotpot, fp)

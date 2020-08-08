@@ -1,8 +1,8 @@
 import json
 from wrangle.ranker import Ranker
-from wrangle.file_constants import HOTPOT_SMALL_COREF_FLATTENED_FILE, GLOVE_FILE, TF_FILE, IDF_FILE, CLOSEST_FACT_MULTIHOP_FILE, CLOSEST_FACT_ONETIME_FILE, CLOSEST_FACT_ORIGINAL_FILE
+from wrangle.file_constants import HOTPOT_COREF_FLATTENED_FILE, GLOVE_FILE, TF_FILE, IDF_FILE, CLOSEST_FACT_MULTIHOP_FILE, CLOSEST_FACT_ONETIME_FILE, CLOSEST_FACT_ORIGINAL_FILE
 
-with open(HOTPOT_SMALL_COREF_FLATTENED_FILE) as fp:
+with open(HOTPOT_COREF_FLATTENED_FILE) as fp:
     data = json.load(fp)
 
 top_sp_onetime_ranks = []

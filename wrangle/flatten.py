@@ -1,9 +1,9 @@
 import json
 import numpy as np
 
-from wrangle.file_constants import HOTPOT_SMALL_COREF_FILE, HOTPOT_SMALL_COREF_FLATTENED_FILE
+from wrangle.file_constants import HOTPOT_COREF_FILE, HOTPOT_COREF_FLATTENED_FILE
 
-with open(HOTPOT_SMALL_COREF_FILE, 'r') as fp:
+with open(HOTPOT_COREF_FILE, 'r') as fp:
     hotpot = json.load(fp)
 
 for idx, datum in enumerate(hotpot):
@@ -27,5 +27,5 @@ for idx, datum in enumerate(hotpot):
             overall_index = paragraph[0][1][sp_index][0]
             datum['numbered_supporting_facts'].append(overall_index)
 
-with open(HOTPOT_SMALL_COREF_FLATTENED_FILE, 'w') as fp:
+with open(HOTPOT_COREF_FLATTENED_FILE, 'w') as fp:
     json.dump(hotpot, fp)

@@ -1,16 +1,26 @@
 DATA_DIR = 'data/'
 PLOT_DIR = 'plots/'
 ANNOTATION_DIR = 'user_annotations/'
-HOTPOT_SMALL_SIZE = str(10000)
+HOTPOT_SMALL_SIZE = str(1000)
 GLOVE_FILE = DATA_DIR + 'glove.840B.300d.pkl'
-TF_FILE = DATA_DIR + 'tf_' + HOTPOT_SMALL_SIZE + '_coref.pkl'
-IDF_FILE = DATA_DIR + 'idf_' + HOTPOT_SMALL_SIZE + '_coref.pkl'
-HOTPOT_RAW_FILE = DATA_DIR + 'hotpot_train_v1.1.json'
-HOTPOT_SMALL_FILE = DATA_DIR + 'hotpot_small_' + HOTPOT_SMALL_SIZE + '.json'
-HOTPOT_SMALL_COREF_FILE = DATA_DIR + 'hotpot_small_' + HOTPOT_SMALL_SIZE + '_coref.json'
-HOTPOT_SMALL_COREF_FLATTENED_FILE = DATA_DIR + 'hotpot_small_' + HOTPOT_SMALL_SIZE + '_coref_flattened.json'
+
+HOTPOT_RAW_FILE_NAME = 'hotpot_train_v1.1'
+HOTPOT_RAW_FILE = DATA_DIR + HOTPOT_RAW_FILE_NAME + '.json'
+
+if HOTPOT_SMALL_SIZE:
+    SMALL_SUBFIX = '_' + HOTPOT_SMALL_SIZE
+else:
+    SMALL_SUBFIX = ''
+
+HOTPOT_FILE = DATA_DIR + HOTPOT_RAW_FILE_NAME + SMALL_SUBFIX + '.json'
+HOTPOT_COREF_FILE = DATA_DIR + HOTPOT_RAW_FILE_NAME + SMALL_SUBFIX + '_coref.json'
+HOTPOT_COREF_FLATTENED_FILE = DATA_DIR + HOTPOT_RAW_FILE_NAME + SMALL_SUBFIX + '_coref_flattened.json'
+
+TF_FILE = DATA_DIR + 'tf' + SMALL_SUBFIX + '_coref.pkl'
+IDF_FILE = DATA_DIR + 'idf' + SMALL_SUBFIX + '_coref.pkl'
 CLOSEST_FACT_DIR = PLOT_DIR + 'closest_fact/'
-CLOSEST_FACT_ONETIME_FILE = CLOSEST_FACT_DIR + 'closest_fact_' + HOTPOT_SMALL_SIZE + '_onetime.json'
-CLOSEST_FACT_MULTIHOP_FILE = CLOSEST_FACT_DIR + 'closest_fact_' + HOTPOT_SMALL_SIZE + '_multihop.json'
-CLOSEST_FACT_ORIGINAL_FILE = CLOSEST_FACT_DIR + 'closest_fact_' + HOTPOT_SMALL_SIZE + '_original.json'
+CLOSEST_FACT_ONETIME_FILE = CLOSEST_FACT_DIR + 'closest_fact' + SMALL_SUBFIX + '_onetime.json'
+CLOSEST_FACT_MULTIHOP_FILE = CLOSEST_FACT_DIR + 'closest_fact' + SMALL_SUBFIX + '_multihop.json'
+CLOSEST_FACT_ORIGINAL_FILE = CLOSEST_FACT_DIR + 'closest_fact' + SMALL_SUBFIX + '_original.json'
+
 ANSWERED_LIST_FILE = 'answered_questions.json'

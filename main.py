@@ -8,7 +8,7 @@ from flask_cors import CORS
 
 from wrangle import ranker
 from wrangle.data_loader import HotpotDataLoader
-from wrangle.file_constants import HOTPOT_SMALL_COREF_FLATTENED_FILE, ANNOTATION_DIR, ANSWERED_LIST_FILE
+from wrangle.file_constants import HOTPOT_COREF_FLATTENED_FILE, ANNOTATION_DIR, ANSWERED_LIST_FILE
 
 
 app = Flask(__name__)

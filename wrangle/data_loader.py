@@ -1,13 +1,13 @@
 import json
 import random
 
-from wrangle.file_constants import HOTPOT_SMALL_COREF_FLATTENED_FILE, TF_FILE, IDF_FILE, GLOVE_FILE
+from wrangle.file_constants import HOTPOT_COREF_FLATTENED_FILE, TF_FILE, IDF_FILE, GLOVE_FILE
 from wrangle.ranker import Ranker
 
 
 class HotpotDataLoader:
     def __init__(self):
-        with open(HOTPOT_SMALL_COREF_FLATTENED_FILE, 'r') as fp:
+        with open(HOTPOT_COREF_FLATTENED_FILE, 'r') as fp:
             self.hotpot = json.load(fp)
         self.size = len(self.hotpot)
         self.ranker = Ranker(GLOVE_FILE, TF_FILE, IDF_FILE)

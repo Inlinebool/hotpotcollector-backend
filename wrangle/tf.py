@@ -4,11 +4,11 @@ import json
 import math
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
-from wrangle.file_constants import HOTPOT_SMALL_COREF_FILE, TF_FILE
+from wrangle.file_constants import HOTPOT_COREF_FILE, TF_FILE
 
 stopwords = set(stopwords.words('english'))
 
-with open(HOTPOT_SMALL_COREF_FILE, 'r') as fp:
+with open(HOTPOT_COREF_FILE, 'r') as fp:
     hotpot = json.load(fp)
 
 def extract_terms(terms: dict, sentence: str):

@@ -4,11 +4,11 @@ import json
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 import math
-from wrangle.file_constants import HOTPOT_SMALL_COREF_FILE, IDF_FILE
+from wrangle.file_constants import HOTPOT_COREF_FILE, IDF_FILE
 
 stopwords = set(stopwords.words('english'))
 
-with open(HOTPOT_SMALL_COREF_FILE, 'r') as fp:
+with open(HOTPOT_COREF_FILE, 'r') as fp:
     hotpot = json.load(fp)
 
 idf = {}
