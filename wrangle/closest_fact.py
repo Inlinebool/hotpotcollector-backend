@@ -38,7 +38,7 @@ for datum in data:
 
         first_fact = ranked_facts[sorted_sp_onetime_ranks[0]]
         selected_fact_positions = [first_fact[0]]
-        chosen_facts = [first_fact[1]]
+        chosen_facts = [first_fact[0]]
         ranked_facts_second = ranker.rank_facts(
             datum['numbered_context_flattened'], datum['question'], chosen_facts)
         sp_second = []
@@ -52,7 +52,7 @@ for datum in data:
 
             second_fact = ranked_facts_second[sp_second[0]]
             selected_fact_positions.append(second_fact[0])
-            chosen_facts.append(second_fact[1])
+            chosen_facts.append(second_fact[0])
             ranked_facts_third = ranker.rank_facts(
                 datum['numbered_context_flattened'], datum['question'], chosen_facts)
             sp_third = []

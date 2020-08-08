@@ -216,8 +216,9 @@ class Ranker:
                     query_tokens.append(token)
         return self.tokenized_embedding(query_tokens)
 
-    def rank_facts(self, flattened_facts: list, question: str, chosen_facts: list):
+    def rank_facts(self, flattened_facts: list, question: str, chosen_fact_numbers: list):
         ranked_facts = []
+        chosen_facts = [flattened_facts[x - 1][1] for x in chosen_fact_numbers]
         query_embedding = self.multihop_query_embedding(
             question, chosen_facts)
         for fact in flattened_facts:

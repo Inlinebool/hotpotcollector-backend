@@ -63,6 +63,15 @@ def request_datum():
         return data_loader.get_random_datum(range, levels, answered_list)
 
 
+@app.route("/rank", methods=['GET'])
+def rank_context():
+    idx = int(request.args.get('idx'))
+    chosen_fact_numbers = request.args.getlist('chosenFacts[]')
+    chosen_fact_numbers = [int(x) for x in chosen_fact_numbers]
+
+    return {'ranked_facts': data_loader.get_ranked_facts(idx, chosen_fact_numbers)}
+
+
 @app.route("/answer", methods=['POST'])
 def get_answer():
     data = request.get_json()
