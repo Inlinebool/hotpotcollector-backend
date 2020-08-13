@@ -20,6 +20,8 @@ user = 'anon'
 now = datetime.datetime.now()
 date_time = now.strftime("%m_%d_%Y_%H:%M:%S")
 
+API_PREFIX = '/api'
+
 data_loader = HotpotDataLoader()
 
 user_size = int(data_loader.size / 6)
@@ -46,7 +48,7 @@ def read_answered_list():
         answered_list = set([])
 
 
-@app.route("/question", methods=['GET'])
+@app.route(API_PREFIX + "/question", methods=['GET'])
 def request_datum():
     idx = request.args.get('idx')
     if idx:
@@ -65,7 +67,7 @@ def request_datum():
         return data_loader.get_random_datum(range, levels, answered_list)
 
 
-@app.route("/rank", methods=['GET'])
+@app.route(API_PREFIX + "/rank", methods=['GET'])
 def rank_context():
     idx = int(request.args.get('idx'))
     chosen_fact_numbers = request.args.getlist('chosenFacts[]')
@@ -74,12 +76,12 @@ def rank_context():
     return {'ranked_facts': data_loader.get_ranked_facts(idx, chosen_fact_numbers)}
 
 
-@app.route("/answer", methods=['POST'])
+@app.route(API_PREFIX + "/answer", methods=['POST'])
 def get_answer():
     data = request.get_json()
 
     now = datetime.datetime.now()
-    date_time = now.strftime("%m_%d_%Y_%H:%M:%S")
+    date_time = now.strftime("%m_%d_%Y_%H_%M_%S")
 
     annotation_filename = ANNOTATION_DIR + 'annotation_' + \
         data['user'] + '_' + date_time + ".json"
