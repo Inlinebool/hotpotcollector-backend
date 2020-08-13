@@ -54,9 +54,11 @@ def request_datum():
         return data_loader.get_datum(datum_idx)
     else:
         user = request.args.get('user')
-        easy = request.args.get('easy') == 'true'
-        medium = request.args.get('medium') == 'true'
-        hard = request.args.get('hard') == 'true'
+        if not user:
+            user = 'anon'
+        easy = request.args.get('easy') == 'true' if request.args.get('easy') else True
+        medium = request.args.get('medium') == 'true' if request.args.get('medium') else True
+        hard = request.args.get('hard') == 'true' if request.args.get('hard') else True
         levels = {'easy': easy, 'medium': medium, 'hard': hard}
         range = user_range[user]
         read_answered_list()
