@@ -33,3 +33,14 @@ class HotpotDataLoader:
         facts = self.hotpot[idx]['numbered_context_flattened']
         question = self.hotpot[idx]['question']
         return self.ranker.rank_facts(facts, question, chosen_facts)
+
+    def get_ranked_fact_numbers(self, idx, chosen_facts):
+        facts = self.hotpot[idx]['numbered_context_flattened']
+        question = self.hotpot[idx]['question']
+        return self.ranker.rank_facts_number(facts, question, chosen_facts)
+
+    def get_ranked_paragraphs(self, idx, chosen_facts):
+        paragraphs = self.hotpot[idx]['corefed_context']
+        facts = self.hotpot[idx]['numbered_context_flattened']
+        question = self.hotpot[idx]['question']
+        return self.ranker.rank_paragraphs(paragraphs, facts, question, chosen_facts)

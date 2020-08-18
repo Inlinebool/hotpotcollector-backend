@@ -216,6 +216,34 @@ class Ranker:
                     query_tokens.append(token)
         return self.tokenized_embedding(query_tokens)
 
+    def paragraph_embedding(self, paragraph: list):
+        tokens = []
+        title = paragraph[0]
+        title_tokens = word_tokenize(title)
+        for token in title_tokens:
+            if token not in Ranker.stopwords:
+                tokens.append(token)
+        for sentence in paragraph[1]:
+            sentence_tokens = word_tokenize(sentence)
+            for token in sentence_tokens:
+                if token not in Ranker.stopwords:
+                    tokens.append(token)
+        return self.tokenized_embedding(tokens)
+
+    def rank_paragraphs(self, paragraphs: list, flattened_facts: list, question: str, chosen_fact_numbers: list):
+        ranked_paragraphs = []
+        chosen_facts = [flattened_facts[x - 1][1] for x in chosen_fact_numbers]
+        query_embedding = self.multihop_query_embedding(
+            question, chosen_facts)
+        for paragraph in paragraphs:
+            paragraph_embedding = self.paragraph_embedding(paragraph)
+            similarity = self.cosine_similarity(
+                paragraph_embedding, query_embedding)
+            ranked_paragraphs.append([paragraph[0], similarity])
+        ranked_paragraphs = sorted(
+            ranked_paragraphs, key=lambda item: item[1], reverse=True)
+        return ranked_paragraphs
+
     def rank_facts(self, flattened_facts: list, question: str, chosen_fact_numbers: list):
         ranked_facts = []
         chosen_facts = [flattened_facts[x - 1][1] for x in chosen_fact_numbers]
@@ -230,3 +258,9 @@ class Ranker:
             ranked_facts, key=lambda item: item[3], reverse=True)
         # print(ranked_facts)
         return ranked_facts
+
+    def rank_facts_number(self, flattened_facts: list, question: str, chosen_fact_numbers: list):
+        ranked_facts = self.rank_facts(
+            flattened_facts, question, chosen_fact_numbers)
+        ranked_number = [x[0] for x in ranked_facts]
+        return ranked_number
