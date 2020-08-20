@@ -78,6 +78,7 @@ def rank_facts():
 
     return {'ranked_fact_numbers': data_loader.get_ranked_fact_numbers(idx, chosen_fact_numbers)}
 
+
 @app.route(API_PREFIX + "/rankparagraph", methods=['GET'])
 def rank_paragraphs():
     idx = int(request.args.get('idx'))
@@ -93,13 +94,15 @@ def get_answer():
 
     now = datetime.datetime.now()
     date_time = now.strftime("%m_%d_%Y_%H_%M_%S")
-
+    
     annotation_filename = ANNOTATION_DIR + 'annotation_' + \
         data['user'] + '_' + date_time + ".json"
     annotations = {}
     annotations['user'] = data['user']
-    annotations['time'] = date_time
+    annotations['submit_time'] = date_time
     annotations['levels'] = data['levels']
+    annotations['interface'] = data['interface']
+    annotations['session_time'] = data['totalTime']
     annotations['data'] = data['data']
 
     with open(annotation_filename, 'w') as fp:
