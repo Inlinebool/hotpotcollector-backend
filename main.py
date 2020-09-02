@@ -120,7 +120,6 @@ def get_answer():
 def new_user():
     user = str(uuid.uuid4())
     practice_questions = FIXED_PRACTICE_QUESTIONS
-    shuffle(practice_questions)
     basic_questions = \
         data_loader.get_random_list([0, data_loader.size], {
             'easy': True, 'medium': False, 'hard': False}, answered_list, EASY_SIZE) \
