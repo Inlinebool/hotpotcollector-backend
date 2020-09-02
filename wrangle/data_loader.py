@@ -10,7 +10,7 @@ class HotpotDataLoader:
         with open(HOTPOT_COREF_FLATTENED_FILE, 'r') as fp:
             self.hotpot = json.load(fp)
         self.size = len(self.hotpot)
-        self.ranker = Ranker(GLOVE_FILE, TF_FILE, IDF_FILE)
+        self.ranker = Ranker(GLOVE_FILE, IDF_FILE)
 
     @property
     def size(self):
@@ -44,3 +44,12 @@ class HotpotDataLoader:
         facts = self.hotpot[idx]['numbered_context_flattened']
         question = self.hotpot[idx]['question']
         return self.ranker.rank_paragraphs(paragraphs, facts, question, chosen_facts)
+
+    def get_random_list(self, range: list, levels: dict, exclude_list: list, target_size: int):
+        result = []
+        while len(result) < target_size:
+            idx = random.randint(range[0], range[1])
+            while not levels[self.hotpot[idx]['level']] or idx in exclude_list:
+                idx = random.randint(range[0], range[1])
+            result.append(idx)
+        return result

@@ -10,7 +10,7 @@ import re
 class Ranker:
     stopwords = set(stopwords.words('english'))
 
-    def __init__(self, glove_file, tf_file, idf_file):
+    def __init__(self, glove_file, idf_file):
         self.unk = np.array([0.22418134, -
                              0.28881392, 0.13854356, 0.00365387, -
                              0.12870757, 0.10243822, 0.061626635, 0.07318011, -
@@ -172,9 +172,6 @@ class Ranker:
 
         with open(glove_file, 'rb') as fp:
             self.glove = pk.load(fp)
-
-        with open(tf_file, 'rb') as fp:
-            self.tf = pk.load(fp)
 
         with open(idf_file, 'rb') as fp:
             self.idf = pk.load(fp)

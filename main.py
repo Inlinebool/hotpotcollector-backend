@@ -2,13 +2,15 @@ import json
 import random
 import datetime
 import os
+import uuid
 from flask import Flask
 from flask import request
 from flask_cors import CORS
+from random import shuffle
 
 from wrangle import ranker
 from wrangle.data_loader import HotpotDataLoader
-from wrangle.file_constants import HOTPOT_COREF_FLATTENED_FILE, ANNOTATION_DIR, ANSWERED_LIST_FILE
+from wrangle.file_constants import HOTPOT_COREF_FLATTENED_FILE, ANNOTATION_DIR, ANSWERED_LIST_FILE, EASY_SIZE, MEDIUM_SIZE, HARD_SIZE, FIXED_BASIC_QUESTIONS, FIXED_PRACTICE_QUESTIONS, FIXED_RANKED_QUESTIONS
 
 
 app = Flask(__name__)
@@ -18,7 +20,7 @@ annotations = {}
 
 user = 'anon'
 now = datetime.datetime.now()
-date_time = now.strftime("%m_%d_%Y_%H:%M:%S")
+date_time = now.strftime('%m_%d_%Y_%H:%M:%S')
 
 API_PREFIX = '/api'
 
@@ -38,6 +40,8 @@ user_range = {
 
 answered_list = set([])
 
+with_context = True
+
 
 def read_answered_list():
     global answered_list
@@ -48,7 +52,7 @@ def read_answered_list():
         answered_list = set([])
 
 
-@app.route(API_PREFIX + "/question", methods=['GET'])
+@app.route(API_PREFIX + '/question', methods=['GET'])
 def request_datum():
     idx = request.args.get('idx')
     if idx:
@@ -70,7 +74,7 @@ def request_datum():
         return data_loader.get_random_datum(range, levels, answered_list)
 
 
-@app.route(API_PREFIX + "/rankfact", methods=['GET'])
+@app.route(API_PREFIX + '/rankfact', methods=['GET'])
 def rank_facts():
     idx = int(request.args.get('idx'))
     chosen_fact_numbers = request.args.getlist('chosenFacts[]')
@@ -79,7 +83,7 @@ def rank_facts():
     return {'ranked_fact_numbers': data_loader.get_ranked_fact_numbers(idx, chosen_fact_numbers)}
 
 
-@app.route(API_PREFIX + "/rankparagraph", methods=['GET'])
+@app.route(API_PREFIX + '/rankparagraph', methods=['GET'])
 def rank_paragraphs():
     idx = int(request.args.get('idx'))
     chosen_fact_numbers = request.args.getlist('chosenFacts[]')
@@ -88,19 +92,20 @@ def rank_paragraphs():
     return {'ranked_paragraphs': data_loader.get_ranked_paragraphs(idx, chosen_fact_numbers)}
 
 
-@app.route(API_PREFIX + "/answer", methods=['POST'])
+@app.route(API_PREFIX + '/answer', methods=['POST'])
 def get_answer():
     data = request.get_json()
 
     now = datetime.datetime.now()
-    date_time = now.strftime("%m_%d_%Y_%H_%M_%S")
-    
+    date_time = now.strftime('%m_%d_%Y_%H_%M_%S')
+
     annotation_filename = ANNOTATION_DIR + 'annotation_' + \
-        data['user'] + '_' + date_time + ".json"
+        data['user'] + '_' + date_time + '.json'
     annotations = {}
     annotations['user'] = data['user']
     annotations['submit_time'] = date_time
-    annotations['levels'] = data['levels']
+    if ('levels' in data):
+        annotations['levels'] = data['levels']
     annotations['interface'] = data['interface']
     annotations['session_time'] = data['totalTime']
     annotations['data'] = data['data']
@@ -108,10 +113,48 @@ def get_answer():
     with open(annotation_filename, 'w') as fp:
         json.dump(annotations, fp)
 
-    global answered_list
-    if (data['data']['answer']):
-        answered_list.add(int(data['data']['idx']))
-        with open(ANSWERED_LIST_FILE, 'w') as fp:
-            json.dump(list(answered_list), fp)
+    return {'success': 'true'}
 
-    return {"success": "true"}
+
+@app.route(API_PREFIX + '/newuser', methods=['GET'])
+def new_user():
+    user = str(uuid.uuid4())
+    practice_questions = FIXED_PRACTICE_QUESTIONS
+    shuffle(practice_questions)
+    basic_questions = \
+        data_loader.get_random_list([0, data_loader.size], {
+            'easy': True, 'medium': False, 'hard': False}, answered_list, EASY_SIZE) \
+        + data_loader.get_random_list([0, data_loader.size], {
+            'easy': False, 'medium': True, 'hard': False}, answered_list, MEDIUM_SIZE) \
+        + data_loader.get_random_list([0, data_loader.size], {
+            'easy': False, 'medium': False, 'hard': True}, answered_list, HARD_SIZE) \
+        + FIXED_BASIC_QUESTIONS
+    shuffle(basic_questions)
+    answered_list.update(basic_questions)
+    ranked_questions = \
+        data_loader.get_random_list([0, data_loader.size], {
+            'easy': True, 'medium': False, 'hard': False}, answered_list, EASY_SIZE) \
+        + data_loader.get_random_list([0, data_loader.size], {
+            'easy': False, 'medium': True, 'hard': False}, answered_list, MEDIUM_SIZE) \
+        + data_loader.get_random_list([0, data_loader.size], {
+            'easy': False, 'medium': False, 'hard': True}, answered_list, HARD_SIZE) \
+        + FIXED_RANKED_QUESTIONS
+    shuffle(ranked_questions)
+    answered_list.update(ranked_questions)
+
+    global with_context
+    with_context = not with_context
+
+    with open(ANSWERED_LIST_FILE, 'w') as fp:
+        json.dump(list(answered_list), fp)
+
+    return {
+        'success': 'true',
+        'data': {
+            'user': user,
+            'contexted': with_context,
+            'practice_questions': practice_questions,
+            'basic_questions': basic_questions,
+            'ranked_questions': ranked_questions
+        }
+    }
