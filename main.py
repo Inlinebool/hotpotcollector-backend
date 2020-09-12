@@ -10,7 +10,7 @@ from random import shuffle
 
 from wrangle import ranker
 from wrangle.data_loader import HotpotDataLoader
-from wrangle.file_constants import HOTPOT_COREF_FLATTENED_FILE, ANNOTATION_DIR, ANSWERED_LIST_FILE, EASY_SIZE, MEDIUM_SIZE, HARD_SIZE, FIXED_BASIC_QUESTIONS, FIXED_PRACTICE_QUESTIONS, FIXED_RANKED_QUESTIONS
+from wrangle.file_constants import HOTPOT_COREF_FLATTENED_FILE, ANNOTATION_DIR, ANSWERED_LIST_FILE, EASY_SIZE, MEDIUM_SIZE, HARD_SIZE, FIXED_PRACTICE_QUESTIONS, FIXED_EASY_QUESTIONS, FIXED_MEDIUM_QUESTIONS, FIXED_HARD_QUESTIONS
 
 
 app = Flask(__name__)
@@ -107,7 +107,9 @@ def get_answer():
     if ('levels' in data):
         annotations['levels'] = data['levels']
     annotations['interface'] = data['interface']
-    annotations['session_time'] = data['totalTime']
+    annotations['question_total_time'] = data['questionTotalTime']
+    annotations['session_start_time'] = data['sessionStartRealTime']
+    annotations['session_end_time'] = data['sessionEndRealTime']
     annotations['data'] = data['data']
 
     with open(annotation_filename, 'w') as fp:
@@ -120,6 +122,12 @@ def get_answer():
 def new_user():
     user = str(uuid.uuid4())
     practice_questions = FIXED_PRACTICE_QUESTIONS
+    easy_questions = FIXED_EASY_QUESTIONS
+    shuffle(easy_questions)
+    medium_questions = FIXED_MEDIUM_QUESTIONS
+    shuffle(medium_questions)
+    hard_questions = FIXED_HARD_QUESTIONS
+    shuffle(hard_questions)
     basic_questions = \
         data_loader.get_random_list([0, data_loader.size], {
             'easy': True, 'medium': False, 'hard': False}, answered_list, EASY_SIZE) \
@@ -127,7 +135,7 @@ def new_user():
             'easy': False, 'medium': True, 'hard': False}, answered_list, MEDIUM_SIZE) \
         + data_loader.get_random_list([0, data_loader.size], {
             'easy': False, 'medium': False, 'hard': True}, answered_list, HARD_SIZE) \
-        + FIXED_BASIC_QUESTIONS
+        + [easy_questions[0]] + [medium_questions[0]] + [hard_questions[0]]
     shuffle(basic_questions)
     answered_list.update(basic_questions)
     ranked_questions = \
@@ -137,7 +145,7 @@ def new_user():
             'easy': False, 'medium': True, 'hard': False}, answered_list, MEDIUM_SIZE) \
         + data_loader.get_random_list([0, data_loader.size], {
             'easy': False, 'medium': False, 'hard': True}, answered_list, HARD_SIZE) \
-        + FIXED_RANKED_QUESTIONS
+        + [easy_questions[1]] + [medium_questions[1]] + [hard_questions[1]]
     shuffle(ranked_questions)
     answered_list.update(ranked_questions)
 
