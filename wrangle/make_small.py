@@ -1,10 +1,11 @@
-import json
 import argparse
+import json
 from random import randrange
-from wrangle.file_constants import DATA_DIR, HOTPOT_RAW_FILE_NAME, HOTPOT_RAW_FILE, HOTPOT_SMALL_SIZE, HOTPOT_FILE
 
-parser = argparse.ArgumentParser(
-    description='make a smaller dataset.')
+from wrangle.file_constants import (DATA_DIR, HOTPOT_FILE, HOTPOT_RAW_FILE,
+                                    HOTPOT_RAW_FILE_NAME, HOTPOT_SMALL_SIZE)
+
+parser = argparse.ArgumentParser(description='make a smaller dataset.')
 parser.add_argument('--target', type=int, help='Target dataset size.')
 
 args = parser.parse_args()

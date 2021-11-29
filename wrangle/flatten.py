@@ -1,7 +1,9 @@
 import json
+
 import numpy as np
 
-from wrangle.file_constants import HOTPOT_COREF_FILE, HOTPOT_COREF_FLATTENED_FILE
+from wrangle.file_constants import (HOTPOT_COREF_FILE,
+                                    HOTPOT_COREF_FLATTENED_FILE)
 
 with open(HOTPOT_COREF_FILE, 'r') as fp:
     hotpot = json.load(fp)

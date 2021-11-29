@@ -1,9 +1,11 @@
-import pickle as pk
-import numpy as np
 import json
+import math
+import pickle as pk
+
+import numpy as np
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
-import math
+
 from wrangle.file_constants import HOTPOT_COREF_FILE, IDF_FILE
 
 stopwords = set(stopwords.words('english'))

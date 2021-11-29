@@ -1,15 +1,18 @@
-import pickle as pk
-import numpy as np
 import json
 import math
+import pickle as pk
+
+import numpy as np
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
+
 from wrangle.file_constants import HOTPOT_COREF_FILE, TF_FILE
 
 stopwords = set(stopwords.words('english'))
 
 with open(HOTPOT_COREF_FILE, 'r') as fp:
     hotpot = json.load(fp)
+
 
 def extract_terms(terms: dict, sentence: str):
     tokens = word_tokenize(sentence)
@@ -20,6 +23,7 @@ def extract_terms(terms: dict, sentence: str):
         else:
             terms[w] += 1
 
+
 def compute_tf(terms: dict):
     max_term = max(terms, key=lambda k: terms[k])
     max_tf = terms[max_term]
@@ -27,6 +31,7 @@ def compute_tf(terms: dict):
         # don't normalize
         terms[term] /= max_tf
     return terms
+
 
 tf = []
 N = len(hotpot)
@@ -44,4 +49,3 @@ for datum in hotpot:
 
 with open(TF_FILE, 'wb') as fp:
     pk.dump(tf, fp, protocol=pk.HIGHEST_PROTOCOL)
-

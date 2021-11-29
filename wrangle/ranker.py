@@ -1,10 +1,11 @@
-import numpy as np
-import pickle as pk
 import json
+import pickle as pk
+import re
+import string
+
+import numpy as np
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
-import string
-import re
 
 
 class Ranker:

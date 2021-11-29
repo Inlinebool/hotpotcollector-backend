@@ -1,8 +1,10 @@
 import json
 import re
+
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
-from wrangle.file_constants import HOTPOT_FILE, HOTPOT_COREF_FILE
+
+from wrangle.file_constants import HOTPOT_COREF_FILE, HOTPOT_FILE
 
 stopwords = set(stopwords.words('english'))
 
@@ -15,8 +17,8 @@ pronouns = ['it', 'It', 'they', 'They', 'she', 'She', 'he', 'He']
 def coref_resolution(s: str, title: str):
     s = s.replace('\\', '\\\\')
     title = title.replace('\\', '\\\\')
-    corefed_s = re.sub('|'.join(r'\b%s\b' %
-                                pronoun for pronoun in pronouns), title, s)
+    corefed_s = re.sub('|'.join(r'\b%s\b' % pronoun for pronoun in pronouns),
+                       title, s)
     corefed_s.replace('\\\\', '\\')
     return corefed_s
 
@@ -30,7 +32,6 @@ for datum in hotpot:
             corefed_paragraph.append(corefed_sentence)
         corefed_context.append([title, corefed_paragraph])
     datum['corefed_context'] = corefed_context
-
 
 # print(tf)
 

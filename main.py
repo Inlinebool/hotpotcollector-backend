@@ -1,15 +1,15 @@
-import json
-import random
 import datetime
+import json
 import os
-from flask import Flask
-from flask import request
+import random
+
+from flask import Flask, request
 from flask_cors import CORS
 
 from wrangle import ranker
 from wrangle.data_loader import HotpotDataLoader
-from wrangle.file_constants import HOTPOT_COREF_FLATTENED_FILE, ANNOTATION_DIR, ANSWERED_LIST_FILE
-
+from wrangle.file_constants import (ANNOTATION_DIR, ANSWERED_LIST_FILE,
+                                    HOTPOT_COREF_FLATTENED_FILE)
 
 app = Flask(__name__)
 CORS(app)
@@ -58,12 +58,12 @@ def request_datum():
         user = request.args.get('user')
         if not user:
             user = 'anon'
-        easy = request.args.get(
-            'easy') == 'true' if request.args.get('easy') else True
-        medium = request.args.get(
-            'medium') == 'true' if request.args.get('medium') else True
-        hard = request.args.get(
-            'hard') == 'true' if request.args.get('hard') else True
+        easy = request.args.get('easy') == 'true' if request.args.get(
+            'easy') else True
+        medium = request.args.get('medium') == 'true' if request.args.get(
+            'medium') else True
+        hard = request.args.get('hard') == 'true' if request.args.get(
+            'hard') else True
         levels = {'easy': easy, 'medium': medium, 'hard': hard}
         range = user_range[user]
         read_answered_list()
@@ -76,7 +76,10 @@ def rank_facts():
     chosen_fact_numbers = request.args.getlist('chosenFacts[]')
     chosen_fact_numbers = [int(x) for x in chosen_fact_numbers]
 
-    return {'ranked_fact_numbers': data_loader.get_ranked_fact_numbers(idx, chosen_fact_numbers)}
+    return {
+        'ranked_fact_numbers':
+        data_loader.get_ranked_fact_numbers(idx, chosen_fact_numbers)
+    }
 
 
 @app.route(API_PREFIX + "/rankparagraph", methods=['GET'])
@@ -85,7 +88,10 @@ def rank_paragraphs():
     chosen_fact_numbers = request.args.getlist('chosenFacts[]')
     chosen_fact_numbers = [int(x) for x in chosen_fact_numbers]
 
-    return {'ranked_paragraphs': data_loader.get_ranked_paragraphs(idx, chosen_fact_numbers)}
+    return {
+        'ranked_paragraphs':
+        data_loader.get_ranked_paragraphs(idx, chosen_fact_numbers)
+    }
 
 
 @app.route(API_PREFIX + "/answer", methods=['POST'])
@@ -94,7 +100,7 @@ def get_answer():
 
     now = datetime.datetime.now()
     date_time = now.strftime("%m_%d_%Y_%H_%M_%S")
-    
+
     annotation_filename = ANNOTATION_DIR + 'annotation_' + \
         data['user'] + '_' + date_time + ".json"
     annotations = {}

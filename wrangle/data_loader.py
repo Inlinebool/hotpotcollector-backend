@@ -1,7 +1,8 @@
 import json
 import random
 
-from wrangle.file_constants import HOTPOT_COREF_FLATTENED_FILE, TF_FILE, IDF_FILE, GLOVE_FILE
+from wrangle.file_constants import (GLOVE_FILE, HOTPOT_COREF_FLATTENED_FILE,
+                                    IDF_FILE, TF_FILE)
 from wrangle.ranker import Ranker
 
 
@@ -21,7 +22,12 @@ class HotpotDataLoader:
         self.__size = size
 
     def get_datum(self, idx):
-        return {'idx': idx, 'question': self.hotpot[idx]['question'], 'context': self.hotpot[idx]['numbered_context'], 'flattened_context': self.hotpot[idx]['numbered_context_flattened']}
+        return {
+            'idx': idx,
+            'question': self.hotpot[idx]['question'],
+            'context': self.hotpot[idx]['numbered_context'],
+            'flattened_context': self.hotpot[idx]['numbered_context_flattened']
+        }
 
     def get_random_datum(self, range: list, levels: dict, exclude_list: list):
         idx = random.randint(range[0], range[1])
@@ -43,4 +49,5 @@ class HotpotDataLoader:
         paragraphs = self.hotpot[idx]['corefed_context']
         facts = self.hotpot[idx]['numbered_context_flattened']
         question = self.hotpot[idx]['question']
-        return self.ranker.rank_paragraphs(paragraphs, facts, question, chosen_facts)
+        return self.ranker.rank_paragraphs(paragraphs, facts, question,
+                                           chosen_facts)
